@@ -1,0 +1,16 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Testing
+# Controls when the workflow will run
+on: push
+
+ # A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  test_proj:
+    runs-on: windows-latest
+      steps: 
+      - uses: actions/main
+      - name: run testing Django
+        run:
+          pip3 install --user django
+          python manage.py test
