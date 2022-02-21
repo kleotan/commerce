@@ -10,7 +10,7 @@ from django.db.models import *
 from django.contrib import messages
 from .models import *
 from django.contrib.auth.decorators import login_required
-from django.views.generic.edit import CreateView, UpdateView
+from django.http import Http404
 
 def index(request):
     goods = ActiveListings.objects.all().order_by("-date_created").exclude(is_closed=True)
@@ -100,45 +100,47 @@ def register(request):
 def pageNotFound(request, exception):
     return HttpResponseNotFound(f"<h1> Сторінку не знайдено </h1>")
 
-
 def get_post(request, post_pk):
-    lot = ActiveListings.objects.get(pk=post_pk)
-    last_bet=Bet.objects.filter(bet_item=lot).last() 
-    if last_bet: # если существует ставка по товару (по товару pk_post)
-        lot.start_bet=last_bet.bet_price # заносим новую ставку в поле start_bet табл.ActiveListings
-    if request.method == 'POST':
-        form = SetBetForm(request.POST)
-        if form.is_valid():
-            item = ActiveListings.objects.values('price').get(pk=post_pk) # получаем значение поля цены товара post_pk из табл.ActiveListings
-            bet_price=form.cleaned_data['bet_price'] # введенная ставка в поле формы.SetBetForm
-            old_bet=Bet.objects.filter(bet_item__pk=post_pk).aggregate(res=Max('bet_price')) # max ставка (по товару pk_post) в таблице ставок Bet
-            if old_bet['res']==None:
-                old_bet['res']=int(0)
-            if bet_price > item['price'] and bet_price > old_bet['res']: # сравниваем ставку из поля табл.Bet с полем табл.ActiveListings И с max ставкой в табл.Bet (по товару pk_post)
-                lot.start_bet=bet_price
-                lot.save() # сохраняем новую ставку с поля bet_price в поле start_bet табл.ActiveListings
-            else:       
-                messages.error(request, 'Нова ставка повинна бути більша за попередню') 
+    try:
+        lot = ActiveListings.objects.get(pk=post_pk)
+        last_bet=Bet.objects.filter(bet_item=lot).last() 
+        if last_bet: # если существует ставка по товару (по товару pk_post)
+            lot.start_bet=last_bet.bet_price # заносим новую ставку в поле start_bet табл.ActiveListings
+        if request.method == 'POST':
+            form = SetBetForm(request.POST)
+            if form.is_valid():
+                item = ActiveListings.objects.values('price').get(pk=post_pk) # получаем значение поля цены товара post_pk из табл.ActiveListings
+                bet_price=form.cleaned_data['bet_price'] # введенная ставка в поле формы.SetBetForm
+                old_bet=Bet.objects.filter(bet_item__pk=post_pk).aggregate(res=Max('bet_price')) # max ставка (по товару pk_post) в таблице ставок Bet
+                if old_bet['res']==None:
+                    old_bet['res']=int(0)
+                if bet_price > item['price'] and bet_price > old_bet['res']: # сравниваем ставку из поля табл.Bet с полем табл.ActiveListings И с max ставкой в табл.Bet (по товару pk_post)
+                    lot.start_bet=bet_price
+                    lot.save() # сохраняем новую ставку с поля bet_price в поле start_bet табл.ActiveListings
+                else:       
+                    messages.error(request, 'Нова ставка повинна бути більша за попередню') 
+                    return redirect('lot', post_pk=lot.id)
+                new_bet=form.save(commit=False)
+                new_bet.last_bet_user = request.user
+                lot.winner = request.user.username
+                new_bet.save()
+                lot.save()
+                request.user.watchlist.add(lot) #якщо request.user зробив ставку автоматично додати товар до watchlist
                 return redirect('lot', post_pk=lot.id)
-            new_bet=form.save(commit=False)
-            new_bet.last_bet_user = request.user
-            lot.winner = request.user.username
-            new_bet.save()
-            lot.save()
-            request.user.watchlist.add(lot) #якщо request.user зробив ставку автоматично додати товар до watchlist
-            return redirect('lot', post_pk=lot.id)
 
-        com_form = CommentsForm(request.POST)
-        if com_form.is_valid():
-            com=com_form.save(commit=False)
-            com.comment_author = request.user
-            com.save()
-            return redirect('lot', post_pk=lot.id)
-    else:
-        form=SetBetForm(instance=lot, initial={'bet_item':lot})
-        com_form=CommentsForm(instance=lot, initial={'item': lot})
-    comments=Comments.objects.filter(item__pk=post_pk).order_by("-date")
-    watchlist=User.objects.filter(watchlist__pk=post_pk)
+            com_form = CommentsForm(request.POST)
+            if com_form.is_valid():
+                com=com_form.save(commit=False)
+                com.comment_author = request.user
+                com.save()
+                return redirect('lot', post_pk=lot.id)
+        else:
+            form=SetBetForm(instance=lot, initial={'bet_item':lot})
+            com_form=CommentsForm(instance=lot, initial={'item': lot})
+        comments=Comments.objects.filter(item__pk=post_pk).order_by("-date")
+        watchlist=User.objects.filter(watchlist__pk=post_pk)
+    except ActiveListings.DoesNotExist:
+        raise Http404
     return render(request, "auctions/lot.html", {
                 'lot': lot,
                'form': form,

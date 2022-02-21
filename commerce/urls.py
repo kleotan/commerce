@@ -14,9 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from cgitb import handler
 from django.contrib import admin
 from django.urls import include, path
+
 from auctions.views import pageNotFound
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
