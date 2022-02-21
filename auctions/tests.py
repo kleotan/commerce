@@ -13,20 +13,14 @@ class AuctionsTestCase(TestCase):
         
         Bet.objects.create(bet_item=lot1, bet_price=550, last_bet_user=user2)
         Bet.objects.create(bet_item=lot1, bet_price=450, last_bet_user=user2)
-        Bet.objects.create(bet_item=lot1, bet_price=550, last_bet_user=user1)
+        Bet.objects.create(bet_item=lot2, bet_price=560, last_bet_user=user1)
     
     def test_lots_count(self):
         lots = ActiveListings.objects.all()
         self.assertEqual(lots.count(), 2)
 
 
-    def test_equal_prices(self):
-        item=ActiveListings.objects.get(pk=1)
-        u=User.objects.get(pk=2)
-        b=Bet.objects.get(bet_item=item, bet_price=550, last_bet_user=u)
-        self.assertTrue(item.equal_fields(1))
-
-    
+   
     def test_bet_price(self):
         item=ActiveListings.objects.get(pk=1)
         u=User.objects.get(pk=2)

@@ -45,10 +45,6 @@ class ActiveListings(models.Model):
         return reverse("lot", kwargs={"post_pk": self.pk})
 
 
-    def equal_fields(self, bet_pk):
-        bet_price = Bet.objects.values('bet_price').get(pk=bet_pk)
-        return self.start_bet > self.price or self.start_bet == bet_price['bet_price']
-
     class Meta:
         verbose_name="Товар"
         verbose_name_plural="Товари"
