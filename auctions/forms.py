@@ -1,7 +1,3 @@
-from dataclasses import field
-from tkinter import Widget
-from turtle import pos
-from django.core.exceptions import ValidationError
 from django import forms
 from auctions.models import *
 from django.db.models import *

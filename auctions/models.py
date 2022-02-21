@@ -47,7 +47,7 @@ class ActiveListings(models.Model):
 
     def equal_fields(self, bet_pk):
         bet_price = Bet.objects.values('bet_price').get(pk=bet_pk)
-        return self.start_bet > self.price and self.start_bet == bet_price['bet_price']
+        return self.start_bet > self.price or self.start_bet == bet_price['bet_price']
 
     class Meta:
         verbose_name="Товар"
