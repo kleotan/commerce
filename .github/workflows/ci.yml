@@ -9,7 +9,7 @@ jobs:
   test_proj:
     runs-on: windows-latest
       steps: 
-      - uses: actions/main
+      - uses: [main]
       - name: run testing Django
         run:
           pip3 install --user django
