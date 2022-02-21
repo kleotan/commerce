@@ -1,0 +1,99 @@
+{% extends "auctions/layout.html" %}
+{% block title %}{{lot.lot_name}}{% endblock %}
+
+{% block body %}
+
+{% if lot %}
+<article class="article">
+        <h3 class="lot-head">{{lot.lot_name}}</h3>
+        
+    {% if user.is_authenticated and user not in watchlist  %}
+    <div class="lot-head-btn">
+        
+            <form action="{% url 'add_watchlist'  lot.id %}" method="post">
+                {% csrf_token %}
+                <p><input type="submit" class="btn btn-primary" id = "add_watch" value="Додати товар до Watchlist" > </p>                
+            </form>
+    </div>
+    {% else %}
+            <form action="{% url 'del_watchlist'  lot.id %}" method="post" align="right" >
+                {% csrf_token %}
+                <li><input type="submit" class="btn btn-primary"  value="Видалити товар з Watchlist" > </li>
+            </form>   
+    {% endif %}
+
+
+
+<div class="row">
+    {% if lot.lot_image %}
+            <div class="column left"><img class="img-thumbnail" height="300" width="300" align="left" src="{{ lot.lot_image.url }}" >
+    {% endif %}
+    <li class="lot-date">{{lot.date_created}}</li>
+    <li class="lot-author">added by: {{lot.lot_author}}</li>
+    </div>
+        <div class="column right">
+        <p class="lot-price">Початкова ціна $:{{ lot.price }}</p>
+            {% if lot.start_bet  %}
+                <li class="bet-lot">Ставка $: {{ lot.start_bet }}</li>
+            {% endif %} 
+        <p class="lot-desc">{{lot.lot_description}}</p>
+        
+        
+    
+        {% if user.is_authenticated %}
+        
+                {% if not lot.is_closed %}
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">
+                        {{ message }}
+                        </div>
+                    {% endfor %}
+                <form action="{% url 'lot' lot.id  %}" method="post" >
+                {% csrf_token %}
+                <div class="form-error">{{ form.non_field_errors }}</div>
+                    <p> {{ form }}
+                    <input type="submit" class="btn btn-success" value="Зробити ставку"> </p>
+                    <div class="form-error" >{{form.errors}}</div>
+                </form>
+                
+                {% else %} 
+                    <h3 class="au-closed"> Аукціон закрито </h3>
+                    <p class="au-closed">Товар продано за {{ lot.start_bet }}$. Переможець - {{ lot.winner }}</p>   
+                {% endif %}      
+            
+            {% if user == lot.lot_author %}
+               <a href="{% url 'edit_post' lot.pk  %}" class="btn btn-warning" >  Редагувати </a> 
+            {% endif %}
+
+        </div>
+    </div>
+   
+        
+    <div class="row-comments" >
+        <h4 class="com-head">Коментарі: </h4>
+        
+        {% for com in comments %}
+        <div class="comment" >
+            <br><span style="font-style: oblique;"> {{ com.comment_author }} </span>
+            <br><span style="font-weight:bold"> {{ com.title }}</span>
+            <br>{{ com.text }}<br>
+            <br><span class="comment-date"> {{ com.date }}</span><br><br>
+        </div>
+        {% endfor %}       
+        
+        <form action="{% url 'lot' lot.pk  %}" method="post" >
+            {% csrf_token %}
+                {% for f in com_form %}  
+                    <p>{{ f }}</p>
+                {% endfor %}
+            <button class ="btn btn-dark" type="submit"> Зберегти </button>
+        </form>
+    </div>
+</article>
+    {% endif %} 
+
+{% else %}
+    {{erorr}}
+{% endif %}    
+
+{% endblock %}

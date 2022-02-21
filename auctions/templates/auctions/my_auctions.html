@@ -1,0 +1,43 @@
+{% extends "auctions/layout.html" %}
+{% block title %} Мої аукціони {% endblock %}
+{% block body %}
+{% if user.is_authenticated %}
+
+    {% for item in items %}
+        {% if user == item.lot_author %}
+    <div  class="container-watch">                     
+    
+        <div class="alert alert-warning">
+            
+            <a href="{% url 'lot' item.pk %}" ><h4>{{ item.lot_name }} </h4> </a>
+                
+                {% if item.start_bet == None %}
+                    <li class="price-lot">$ {{item.price}} </li>
+                {% else %}
+                    <li class="price-lot">Ставка $: {{ item.start_bet }}</li>
+                {% endif %}
+            
+                
+            {% if item.is_closed is False %}
+            <p></p><a href="{% url 'edit_post' item.pk  %}" class="btn btn-warning" >  Редагувати </a> </p>
+                <form action="{% url 'closed' item.pk %}" method="post">
+                    {% csrf_token %}
+                    <p> <input type="submit" class="btn btn-secondary" value= "Закрити аукціон"> </p>
+                </form>
+            {% elif item.is_closed %}
+                <h3> Аукціон закрито </h3>
+                <p>Переможець:  {{ item.winner }} </p>
+            {% endif %}
+        </div>  
+    </div> 
+        {% endif %}
+    
+        {% empty %}
+            <h3> AuctionsList is empty </h3>
+           
+    {% endfor %}
+            {% else %}
+                Not signed in.
+            {% endif %}
+    
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "auctions/layout.html" %}
+{% block title %}Головна{% endblock %}
+
+{% block body %}
+
+{% if user.is_authenticated %}
+
+{% if messages %}
+<ul class="messages">
+    Ви стали переможцем аукціону: 
+    {% for message in messages %}
+        <li class="{{ message.tags }}">
+            {{ message|safe }}
+        </li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% endif %}
+
+<article>    
+<ul class="list-articles">
+    {% for el in goods %}
+        
+        <div class="container">    
+          <p class="row justify-content-end" >Дата створення: {{ el.date_created|date:"D-m-Y H:i:s"}}</p>
+       
+        <div>
+        {% if el.lot_image %}
+                <p><img class="img-list"  src="{{ el.lot_image.url }}" ></p>
+        {% endif %}
+        </div>                
+                <div class="desc">
+                    <p ><h4><a href="{% url 'lot' el.pk %}" >{{el.lot_name}}</a></h4> </p>  
+                    <p >{{el.lot_description|truncatechars:200}} 
+                    <a href="{% url 'lot' el.pk %}" > Детальніше...  </a></p>
+                </div>
+                
+            {% if el.start_bet == None %}
+                <div class="price">${{el.price}} </div>
+            {% else %}
+                <div class="price">${{el.start_bet}} </div>
+            {% endif %}    
+        </div>       
+        
+        
+    {% endfor %}
+</ul> 
+
+</article>    
+
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "auctions/layout.html" %}
+{% block title %}Додати аукціон{% endblock %}
+{% block body %}
+    {% if user.is_authenticated %}
+    <h3 style="color: rgb(103, 199, 255);">Додати новий лот</h3>
+    <div class="form-add">
+    <form action="{% url 'add_auction'  %}"  method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-error">{{ form.non_field_errors }}</div>
+
+        {% for f in form %}  
+            <p><label class="form-label" for {{f.id_for_label}}> {{f.label}}: </label>{{ f }}</p>
+            <div class="form-error" >{{f.errors}}</div>
+        {% endfor %}
+        <button class ="btn btn-dark" type="submit">Додати </button>
+    </form>
+    </div>
+    {% endif %}    
+  
+{% endblock %}

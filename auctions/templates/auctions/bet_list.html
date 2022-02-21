@@ -1,0 +1,17 @@
+{% extends "auctions/layout.html" %}
+{% block title %} Ставки {% endblock %}
+{% block body %}
+
+{% if user.is_authenticated %}
+<h3>Ваш список ставок, {{ user.username }}</h3>
+      {% for lot in lots %}
+         <ul class="bet-lst"> 
+           <li> {{ lot.bet_item }} - {{ lot.bet_price }}$</li>
+         </ul> 
+         {% empty %}
+      <h3>Ставок немає</h3>
+      {% endfor %}
+      
+{% endif %} 
+
+{% endblock %}

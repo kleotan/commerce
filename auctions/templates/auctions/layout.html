@@ -1,0 +1,92 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}Auctions{% endblock %}</title>
+        
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+        <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
+        <link rel="shortcut icon" href="{% static 'auctions/images/log.png' %}" type="image/png">
+    </head>
+    <body>
+        <header>
+           <div class="h-header">Auctions</div>
+        </header>
+
+        
+        <div>
+            {% if user.is_authenticated %}
+                Signed in as <strong>{{ user.username }}</strong>.
+                
+            {% else %}
+                Not signed in.
+            {% endif %}
+        </div>
+        
+    <div class="container-fluid">
+        <ul class="nav">
+            {% if cat_selected == 0 %}
+                <li class="selected">Аукціони</li>
+            {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'index' %}">Аукціони</a></li>
+                {% endif %}
+            
+            {% if c_selected == 0 %}
+                <li class="selected">Категорії</li>
+            {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'cats' %}">Категорії</a></li>
+                {% endif %}       
+            
+            {% if user.is_authenticated %}
+                {% if w_selected == 0 %}
+                <li class="selected">Watchlist</li>
+                    {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'watchlist' user.id %}">Watchlist</a></li>
+                {% endif %} 
+
+                {% if my_list_selected == 0 %}
+                <li class="selected">Мої аукціони</li>
+                    {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'my_auctions' user.id %}">Мої аукціони</a></li>
+                {% endif %}
+
+                {% if add_selected == 0 %}
+                <li class="selected">Додати аукціон</li>
+                    {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'add_auction' %}">Додати аукціон</a></li>
+                {% endif %}
+
+                {% if bet_selected == 0 %}
+                <li class="selected">Ставки</li>
+                    {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'bet_list' %}">Ставки</a></li>
+                {% endif %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Log Out</a></li>
+            {% else %}
+                {% if log_selected == 0 %}
+                <li class="selected">Log In</li>
+                    {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Log In</a></li>
+                {% endif %}
+
+                {% if reg_selected == 0 %}
+                <li class="selected">Register</li>
+                    {% else %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a></li>
+                {% endif %}
+            {% endif %}
+
+            
+        </ul>
+        <hr>
+        {% block body %}
+        {% endblock %}
+    </div>
+
+
+    <footer>  <!-- "подвал" сайта -->
+		<address></address>
+	</footer>
+    </body>
+</html>

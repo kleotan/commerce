@@ -1,0 +1,46 @@
+{% extends "auctions/layout.html" %}
+{% block title %} Watchlist {% endblock %}
+{% block body %}
+{% if user.is_authenticated %}
+
+<article>    
+    <ul class="list-articles">
+    {% for item in items %}
+            <div class="container">
+
+            <p class="row justify-content-end">Дата оновлення: {{ item.date_created|date:"D-m-Y H:i:s"}}</p>
+
+                {% if item.lot_image %}
+                    <li><img class="img-list" src="{{ item.lot_image.url }}" ></li>
+                {% endif %}
+
+                <div class="desc">
+                    <p ><a href="{% url 'lot' item.pk %}" ><h4>{{item.lot_name}} </h4> </a></p>  
+                    <p >{{item.lot_description|truncatechars:200}} 
+                    <a href="{% url 'lot' item.pk %}" > Детальніше...  </a></p>
+                </div>
+
+                {% if item.start_bet == None %}
+                    <p class="price">$ {{item.price}} </p>
+                {% else %}
+                    <p class="price">$ {{item.start_bet}} </p>
+                {% endif %}
+          
+            <form action="{% url 'del_watchlist'  item.pk %}" method="post" align="right" >
+                {% csrf_token %}
+                <li><input type="submit" class="btn btn-primary"  value="Видалити товар з Watchlist" > </li>
+            </form>   
+        
+        </div>  
+    
+        {% empty %}
+            <h3> Watchlist is empty </h3>
+           
+    {% endfor %}
+            {% else %}
+                Not signed in.
+            {% endif %}
+           
+</ul>   
+</article>    
+{% endblock %}

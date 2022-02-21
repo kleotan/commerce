@@ -1,0 +1,22 @@
+{% extends "auctions/layout.html" %}
+{% block title %}Редагування{% endblock %}
+{% block body %}
+<h3 style="color: rgb(103, 199, 255);">Редагування</h3>
+    
+    <div style="padding: 20px;">
+    <form action="{{ lot.get_absolut_url }}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-error">{{ form.non_field_errors }}</div>
+
+        {% for f in form %}  
+        <p><label class="form-label" for {{f.id_for_label}}> {{f.label}}: </label>{{ f }}</p>
+        <div class="form-error" >{{f.errors}}</div>
+        {% endfor %}
+        <button class ="btn btn-dark" type="submit"> Зберегти </button>
+    </form>
+    </div>
+    
+ 
+  
+{% endblock %}

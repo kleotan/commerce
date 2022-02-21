@@ -1,0 +1,12 @@
+{% extends "auctions/layout.html" %}
+{% block title %}Категорії{% endblock %}
+{% block body %}
+
+<div class="cats-header">Виберіть категорію:</div>
+            {% for cat in cats %}
+            <ul>
+                <li class="cats"><a class="cats-link" href="{% url 'category' cat.id %}" >{{ cat }}</a></li>
+            </ul>
+            {% endfor %}  
+ 
+{% endblock %}
